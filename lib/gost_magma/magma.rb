@@ -14,6 +14,14 @@ module GostMagma
       bytes.unpack('H*')[0].scan(/.{1,#{line_size}}/).each{|s| puts(s)}
     end
 
+    def self.zeroBytes(n)
+      ("\x00"*n).force_encoding('BINARY')
+    end
+
+    def self.zeroBlock
+      ("\x00"*BlockLengthInBytes).force_encoding('BINARY')
+    end
+
     # Unload 32-bit number to 8-byte string
     # (big-endian, adding leading zeroes)
     def self.uint32ToUint8BE(n)
@@ -96,7 +104,7 @@ module GostMagma
       output = uint32ToUint8(left) + uint32ToUint8(right)
     end
 
-    def decryptBlockUintKey(input, keys)
+    def self.decryptBlockUintKey(input, keys)
       right = uint8ToUint32(input[0..3])
       left = uint8ToUint32(input[4..-1])
       right, left = decryptCycle(right, left, keys)
@@ -104,16 +112,54 @@ module GostMagma
     end
 
     def self.encryptBlock(input, keys)
-      tmp_input = input.reverse
+      tmp_input = input.reverse 
       tmp_output = encryptBlockUintKey(tmp_input, keys)
-      output = tmp_input.reverse
+      output = tmp_output.reverse
     end
 
     def self.decryptBlock(input, keys)
       tmp_input = input.reverse
-      tmp_output = decryptBlockUintKey(tmp_input keys)
+      tmp_output = decryptBlockUintKey(tmp_input, keys)
       output = tmp_output.reverse
     end
+
+    # Increment CTR counter
+    def self.incrementModulo(counter, size)
+      lastIndex = size - 1
+      (0...size).each do |i|
+        if counter[lastIndex - i].ord > 0xfe then  
+          counter[lastIndex - i] = (counter[lastIndex - i].ord - 0xff).chr  
+        else 
+          counter[lastIndex - i] = (counter[lastIndex - i].ord + 1).chr 
+          break 
+        end  
+      end
+      counter
+    end
     
+    # block - byte string  
+    def self.shiftLeftOne(block)
+      (0...(BlockLengthInBytes-1)).each do |i|
+        ri1 = block[i+1].ord
+        ri = block[i].ord << 1
+        ri &= 0xfe
+        ri |= (ri1 >> 7) & 0x1
+        block[i] = ri.chr
+      end
+      ri = block[BlockLengthInBytes-1].ord << 1
+      block[BlockLengthInBytes-1] = (ri & 0xfe).chr
+      block
+    end
+    
+    def self.padd(incomplete_block)
+      padding_len = BlockLengthInBytes - (incomplete_block.length % BlockLengthInBytes)
+      padded_block = incomplete_block.dup
+      padded_block += 0x80.chr
+      padding_len -= 1
+      if padding_len > 0 then
+        padded_block += 0.chr * padding_len
+      end
+      padded_block
+    end
   end
 end

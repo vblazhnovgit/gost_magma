@@ -2,8 +2,10 @@ module GostMagma
   class MagmaEcb < Magma
     # key = 32-byte string
     def initialize(key)
+      @key = key.dup.force_encoding('BINARY')
+      @keys = []
       (0...8).each do |i|
-        @keys[i] = Uint8ToUint32(key[i*4...(i+1)*4].reverse);
+        @keys << self.class.uint8ToUint32(@key[i*4...(i+1)*4].reverse)
       end
     end
     

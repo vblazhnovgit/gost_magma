@@ -6,8 +6,16 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    ansi (1.5.0)
+    builder (3.2.3)
     minitest (5.11.3)
+    minitest-reporters (1.2.0)
+      ansi
+      builder
+      minitest (>= 5.0)
+      ruby-progressbar
     rake (10.5.0)
+    ruby-progressbar (1.10.0)
 
 PLATFORMS
   x64-mingw32
@@ -16,6 +24,7 @@ DEPENDENCIES
   bundler (~> 2.0)
   gost_magma!
   minitest (~> 5.0)
+  minitest-reporters (= 1.2.0)
   rake (~> 10.0)
 
 BUNDLED WITH
