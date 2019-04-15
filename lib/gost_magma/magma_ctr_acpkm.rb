@@ -1,10 +1,10 @@
 module GostMagma
   class MagmaCtrAcpkm < Magma
     def initialize(key, iv, gamma_s, section_N)
-      puts 'Magma initialize'
+#      puts 'MagmaCtrAcpkm initialize'
       @key = key.dup.force_encoding('BINARY')
-      puts '@key:'
-      self.class.printBytes(@key)
+#      puts '@key:'
+#      self.class.printBytes(@key)
       @keys = []
       (0...8).each do |i|
         @keys << self.class.uint8ToUint32(@key[i*4...(i+1)*4].reverse)
@@ -24,14 +24,16 @@ module GostMagma
       @counter += 0.chr * (BlockLengthInBytes/2) 
       @gamma = self.class.encryptBlock(@counter, @keys)
       self.class.incrementModulo(@counter, BlockLengthInBytes)
+=begin      
       puts '@gamma:'
       self.class.printBytes(@gamma)
       puts '@counter:'
       self.class.printBytes(@counter)
+=end      
     end
     
     def encrypt(indata)
-      puts 'Magma encrypt'
+#      puts 'Magma encrypt'
       data_len = indata.length
       if data_len > 0 then
         outdata = self.class.zeroBytes(data_len)
@@ -40,10 +42,12 @@ module GostMagma
             acpkmCtrKey
             @gamma = self.class.encryptBlock(@counter, @keys)
             self.class.incrementModulo(@counter, BlockLengthInBytes)
+=begin            
       puts '@gamma:'
       self.class.printBytes(@gamma)
       puts '@counter:'
       self.class.printBytes(@counter)
+=end      
             @section_bytes = 0
             @block_bytes = 0
             @gamma_bytes = 0         
@@ -51,10 +55,12 @@ module GostMagma
             if @gamma_bytes == @gamma_s then
               @gamma = self.class.encryptBlock(@counter, @keys)
               self.class.incrementModulo(@counter, BlockLengthInBytes)
+=begin              
       puts '@gamma:'
       self.class.printBytes(@gamma)
       puts '@counter:'
       self.class.printBytes(@counter)
+=end      
               @gamma_bytes = 0
             end
             if @block_bytes == BlockLengthInBytes then
@@ -93,13 +99,13 @@ module GostMagma
     ].pack('C*').freeze  
     
     def acpkmCtrKey
-      puts 'acpkmCtrKey'
+#      puts 'acpkmCtrKey'
       @key = self.class.encryptBlock(W1, @keys) + 
         self.class.encryptBlock(W2, @keys) +
         self.class.encryptBlock(W3, @keys) +
         self.class.encryptBlock(W4, @keys)
-      puts '@key:'
-      self.class.printBytes(@key)
+#      puts '@key:'
+#      self.class.printBytes(@key)
       @keys = []
       (0...8).each do |i|
         @keys << self.class.uint8ToUint32(@key[i*4...(i+1)*4].reverse)

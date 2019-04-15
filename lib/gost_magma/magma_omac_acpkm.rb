@@ -3,6 +3,7 @@ module GostMagma
   class MagmaOmacAcpkm < MagmaCtrAcpkm
 
     def initialize(key, section_N, base_key_change_T, mac_size)
+      puts 'MagmaOmacAcpkm initialize'
       @mac_N = section_N
       @mac_T = base_key_change_T 
       @mac_size = mac_size
@@ -10,7 +11,7 @@ module GostMagma
       @ecb = MagmaEcb.new(key)
       @mac_R = Magma::zeroBlock
       @mac_B = Magma::zeroBlock
-      @mac_B[-1] = 0xb1.chr
+      @mac_B[-1] = 0x1b.chr
       @mac_K1 = Magma::zeroBlock
       @mac_K2 = Magma::zeroBlock
       @mac_C = Magma::zeroBlock
@@ -29,6 +30,7 @@ module GostMagma
     end
     
     def update(data)
+      puts 'MagmaOmacAcpkm update'
       data_len = data.length
       (0...data_len).each do |k|
         if @mac_lastBlockSize < BlockLengthInBytes then
@@ -68,6 +70,7 @@ module GostMagma
     end
     
     def final
+      puts 'MagmaOmacAcpkm final'
       @mac_lastBlock = @mac_lastBlock[0...@mac_lastBlockSize]
       if (@mac_byte_counter == 0) || (@mac_lastBlockSize > 0) then
         if @mac_lastBlockSize != BlockLengthInBytes then
@@ -94,7 +97,7 @@ module GostMagma
     
     ACPKM_CTR_IV = [
       0xFF, 0xFF, 0xFF, 0xFF
-    ].pack('C*')
+    ].pack('C*').freeze
     
     OMAC_ACPKM_MAX_N = 0x19999999 # 0x80000000/5
     

@@ -83,6 +83,15 @@ SelfTestGostMCbcEncText = [
   0x20, 0xb7, 0x8b, 0x1a, 0x7c, 0xd7, 0xe6, 0x67
 ].pack('C*').freeze
 
+# ACPKM test key
+SelfTestGostMAcpkmKeyData = [
+  0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 
+  0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 
+  0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10, 
+  0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF
+].pack('C*').freeze
+
+
 # CTR-ACPKM
 SelfTestGostMCtrAcpkmGamma_s = BlockSize
 SelfTestGostMCtrAcpkmSection_N = BlockSize * 2
@@ -110,22 +119,22 @@ SelfTestGostMCtrAcpkmEncText = [
   0x84, 0xA2, 0xF1, 0x5B, 0x3F, 0xCA, 0x72, 0xC1
 ].pack('C*').freeze
 
+# OMAC-ACPKM
+  
+SelfTestGostMMacAcpkm_s = BlockSize
+SelfTestGostMMacAcpkm_N = BlockSize * 2
+SelfTestGostMMacAcpkm_T = SelfTestGostMMacAcpkm_N * 5
 
-# OMAC-ACPKM  
-SelfTestGostMCtrAcpkmMac_s = BlockSize
-SelfTestGostMCtrAcpkmMac_N = BlockSize * 2
-SelfTestGostMCtrAcpkmMac_T = SelfTestGostMCtrAcpkmMac_N * 5
-
-SelfTestGostMCtrAcpkmMac_M = [
+SelfTestGostMMacAcpkm_M = [
   0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x00, 
   0xFF, 0xEE, 0xDD, 0xCC,
 ].pack('C*').freeze
 
-SelfTestGostMCtrAcpkmMac_mac_M = [
+SelfTestGostMMacAcpkm_mac_M = [
   0xA0, 0x54, 0x0E, 0x37, 0x30, 0xAC, 0xBC, 0xF3,
 ].pack('C*').freeze
   
-SelfTestGostMCtrAcpkmMac_data_TC26_M_5 = [
+SelfTestGostMMacAcpkm_TC26_M_5 = [
 	0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x00, 
 	0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88, 
 	0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 
@@ -133,7 +142,7 @@ SelfTestGostMCtrAcpkmMac_data_TC26_M_5 = [
 	0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
 ].pack('C*').freeze
 
-SelfTestGostMCtrAcpkmMac_mac_TC26_macM_5 = [
+SelfTestGostMMacAcpkm_TC26_mac_M_5 = [
 	0x34, 0x00, 0x8d, 0xad, 0x54, 0x96, 0xbb, 0x8e
 ].pack('C*').freeze
 
@@ -227,9 +236,9 @@ class GostMagmaTest < Minitest::Test
   end
 
   def test_ctr_acpkm
+    key = SelfTestGostMAcpkmKeyData
     s = SelfTestGostMCtrAcpkmGamma_s
     n = SelfTestGostMCtrAcpkmSection_N
-    key = SelfTestGostMMasterKeyData
     iv = SelfTestGostMCtrAcpkmIV
     plain_text = SelfTestGostMCtrAcpkmPlainText
     encrypted_test = SelfTestGostMCtrAcpkmEncText
@@ -245,19 +254,19 @@ class GostMagmaTest < Minitest::Test
   end
 
   def test_omac_acpkm
-    key = SelfTestGostMMasterKeyData
-    s = SelfTestGostMCtrAcpkmMac_s
-    n = SelfTestGostMCtrAcpkmMac_N
-    t = SelfTestGostMCtrAcpkmMac_T
+    key = SelfTestGostMAcpkmKeyData
+    s = SelfTestGostMMacAcpkm_s
+    n = SelfTestGostMMacAcpkm_N
+    t = SelfTestGostMMacAcpkm_T
     
-    plain_text = SelfTestGostMCtrAcpkmMac_M
-    mac_test = SelfTestGostMCtrAcpkmMac_mac_M    
+    plain_text = SelfTestGostMMacAcpkm_M
+    mac_test = SelfTestGostMMacAcpkm_mac_M    
     mac = MagmaOmacAcpkm.new(key, n, t, s).update(plain_text).final
     assert mac == mac_test 
     
-    plain_text = SelfTestGostMCtrAcpkmMac_data_TC26_M_5
+    plain_text = SelfTestGostMMacAcpkm_TC26_M_5
     text_len = plain_text.length
-    mac_test = SelfTestGostMCtrAcpkmMac_mac_TC26_M_5    
+    mac_test = SelfTestGostMMacAcpkm_TC26_mac_M_5    
     mac = MagmaOmacAcpkm.new(key, n, t, s).update(plain_text[0...text_len/3]).update(plain_text[text_len/3..-1]).final
     assert mac == mac_test 
   end
