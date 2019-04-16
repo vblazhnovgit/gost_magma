@@ -48,7 +48,7 @@ module GostMagma
           @mac_C = @ecb.encrypt(@mac_encrBlock)
           if @mac_byte_counter % @mac_N == 0 then
             if @mac_section_counter >= OMAC_ACPKM_MAX_N then
-              puts('Input message is too long for Magma OMAC-ACPKM')
+              raise RangeError, 'Input message is too long for Magma OMAC-ACPKM'
               return nil
             end  
             @mac_section_counter += 1
