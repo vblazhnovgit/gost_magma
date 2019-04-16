@@ -1,10 +1,7 @@
 module GostMagma
   class MagmaCtrAcpkm < Magma
     def initialize(key, iv, gamma_s, section_N)
-      puts 'MagmaCtrAcpkm initialize'
       @key = key.dup.force_encoding('BINARY')
-      puts '@key:'
-      self.class.printBytes(@key)
       @keys = []
       (0...8).each do |i|
         @keys << self.class.uint8ToUint32(@key[i*4...(i+1)*4].reverse)
@@ -23,44 +20,25 @@ module GostMagma
       @counter = @iv[0...(BlockLengthInBytes/2)] 
       @counter += 0.chr * (BlockLengthInBytes/2) 
       @gamma = self.class.encryptBlock(@counter, @keys)
-      
-      puts '@counter:'
-      self.class.printBytes(@counter)
-      puts '@gamma:'
-      self.class.printBytes(@gamma)
-      
       self.class.incrementModulo(@counter, BlockLengthInBytes)           
     end
     
     def encrypt(indata)
-      puts 'MagmaCtrAcpkm encrypt'
       data_len = indata.length
       if data_len > 0 then
         outdata = self.class.zeroBytes(data_len)
         (0...data_len).each do |i|
           if @section_bytes == @section_N then
             acpkmCtrKey
-      puts '@counter:'
-      self.class.printBytes(@counter)
             @gamma = self.class.encryptBlock(@counter, @keys)
-      puts '@gamma:'
-      self.class.printBytes(@gamma)
-            self.class.incrementModulo(@counter, BlockLengthInBytes)
-            
-      
+            self.class.incrementModulo(@counter, BlockLengthInBytes)                  
             @section_bytes = 0
             @block_bytes = 0
             @gamma_bytes = 0         
           else
             if @gamma_bytes == @gamma_s then
-      puts '@counter:'
-      self.class.printBytes(@counter)
               @gamma = self.class.encryptBlock(@counter, @keys)
-      puts '@gamma:'
-      self.class.printBytes(@gamma)
-              self.class.incrementModulo(@counter, BlockLengthInBytes)
-              
-      
+              self.class.incrementModulo(@counter, BlockLengthInBytes)              
               @gamma_bytes = 0
             end
             if @block_bytes == BlockLengthInBytes then
@@ -99,13 +77,10 @@ module GostMagma
     ].pack('C*').freeze  
     
     def acpkmCtrKey
-      puts 'acpkmCtrKey'
       @key = self.class.encryptBlock(W1, @keys) + 
         self.class.encryptBlock(W2, @keys) +
         self.class.encryptBlock(W3, @keys) +
         self.class.encryptBlock(W4, @keys)
-      puts '@key:'
-      self.class.printBytes(@key)
       @keys = []
       (0...8).each do |i|
         @keys << self.class.uint8ToUint32(@key[i*4...(i+1)*4].reverse)
