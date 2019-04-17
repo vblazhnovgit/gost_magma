@@ -11,4 +11,5 @@ module GostMagma
   require "gost_magma/magma_cbc"
   require "gost_magma/magma_ctr_acpkm"
   require "gost_magma/magma_omac_acpkm"
+  require "gost_magma/magma_key_exp_imp"
 end

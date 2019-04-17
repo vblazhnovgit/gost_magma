@@ -1,6 +1,6 @@
 # GostMagma
 
-GOST R 34.12/13-2015 (Magma) block cipher algorithms for ECB, CBC, CTR, OFB, CFB, OMAC, CTR-ACPKM and OMAC-ACPKM modes.
+GOST R 34.12/13-2015 (Magma) block cipher algorithms for ECB, CBC, CTR, OFB, CFB, OMAC, CTR-ACPKM, OMAC-ACPKM modes and key export/import algorithms.
 
 ## Installation
 
