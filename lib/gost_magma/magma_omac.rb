@@ -64,7 +64,6 @@ module GostMagma
       end
       
       (0...indata_length/BlockLengthInBytes).each do |i|
-        indata_index = i * BlockLengthInBytes
         if @isFirstBlock then
           @lastBlock = indata[indata_index...(indata_index + BlockLengthInBytes)].dup
           @lastBlockSize = BlockLengthInBytes
@@ -141,3 +140,4 @@ module GostMagma
 
   end
 end
+
