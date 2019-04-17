@@ -1,5 +1,5 @@
 module GostMagma
-  class MagmaKeyExpImp < Kuznyechik
+  class MagmaKeyExpImp < Magma
     def self.export(key, key_mac, key_enc, iv)
       mac = MagmaOmac.new(key_mac, BlockLengthInBytes).update(iv+key).final
       ctr = MagmaCtr.new(key_enc, iv, BlockLengthInBytes)
