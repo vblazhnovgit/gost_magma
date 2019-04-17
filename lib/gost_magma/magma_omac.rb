@@ -30,6 +30,7 @@ module GostMagma
         if indata_length < BlockLengthInBytes - @lastBlockSize then
           # No full block
           @lastBlock += indata
+          @lastBlockSize += indata_length
           @bytes_count += indata_length
           return self
         else
